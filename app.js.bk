@@ -69,11 +69,10 @@ var spooky = new Spooky({
             transport: 'http'
         },
         casper: {
-            logLevel: 'debug',
-            verbose: false,
-            pageSettings: {
-              // userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12A365 Safari/600.1.4'
-            }
+            // logLevel: 'debug',
+            // logLevel: 'info',
+            logLevel: 'fatal',
+            verbose: true
         }
     }, function (err) {
         if (err) {
@@ -81,16 +80,35 @@ var spooky = new Spooky({
             e.details = err;
             throw e;
         }
-        // spooky.userAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12A365 Safari/600.1.4");
+
         spooky.start(screenshotUrl);
         _.each(settings, function(values, key, settings) {
-          // spooky.userAgent(values.userAgent);
-          // emitで呼び出す
-          spooky.on('elog', function (msg) {
-            console.log(msg);
+          // var vvv = values;
+          console.log(key + ' : ' + values.viewport.width);
+          // spooky.on('then', function (values) {
+          //   console.log(values);
+          //   this.viewport(values.viewport.width, alues.viewport.height);
+          //   this.echo('Screenshot for ' + values.name + ' (' + values.viewport.width + 'x' + values.viewport.height + ')', 'info');
+          //   // console.log(line);
+          // });
+
+          // emitで呼ぶ
+          spooky.on('log', function (msg) {
+              console.log(msg);
           });
 
+          spooky.then([{
+            w: values.viewport.width,
+            h: values.viewport.height,
+            u: values.userAgent,
+          }, function () {
+            emit('log', 'w:'+ w + " h:"+ h + " u:" + u);
+            this.viewport(w, h);
+            this.userAgent(u);
+          }]);
+
           spooky.thenOpen(screenshotUrl, function() {
+            console.log("thenOpen");
             this.wait(5000);
             this.evaluate(function() {
               if(document.body.style.backgroundColor===''){
@@ -101,16 +119,12 @@ var spooky = new Spooky({
           });
 
           spooky.then([{
-            k: key,
             t: screenshotDateTime,
             n: values.name,
             w: values.viewport.width,
             h: values.viewport.height
-            ,u: values.userAgent
           }, function () {
-            emit('elog', 'k:' + k +' w:'+ w + " h:"+ h + " u:" + u);
-            // this.userAgent(u);
-            this.viewport(w, h);
+            emit('log', 'w:'+ w + " h:"+ h)
             this.echo('Screenshot for ' + n + ' (' + w + 'x' + h + ')', 'info');
             this.capture('screenshots/' + t + '/' + n + '-' + w + 'x' + h + '.png');
             //     // this.page.paperSize = { format: 'A3', orientation: 'portrait', border: '1cm'} ;
@@ -121,9 +135,7 @@ var spooky = new Spooky({
           //      this.capture('test.png');
           // });
         });
-        spooky.run(function(){
-          this.exit();
-        });
+        spooky.run();
     });
 
 spooky.on('error', function (e, stack) {
