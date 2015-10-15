@@ -1,7 +1,7 @@
 try {
     var Spooky = require('spooky');
 } catch (e) {
-    var Spooky = require('../lib/spooky');
+    var Spooky = require('./lib/spooky');
 }
 var _ = require('underscore');
 var _html = (function () {/*
@@ -79,18 +79,13 @@ var spooky = new Spooky({
             throw e;
         }
 
-        spooky.start(
-            'http://en.wikipedia.org/wiki/Spooky_the_Tuff_Little_Ghost');
+        spooky.start(screenshotUrl);
         spooky.then(
           function () {
             this.viewport(1920, 1080);
-            // this.viewport(values.viewport.width, values.viewport.height);
-            // this.emit('hello', 'Hello, from ' + this.evaluate(function () {
-            //     return document.title;
-            // }));
-            this.capture('test.png');
-        });
-        spooky.thenOpen('http://en.wikipedia.org/wiki/Spooky_the_Tuff_Little_Ghost', function() {
+          }
+        );
+        spooky.thenOpen(screenshotUrl, function() {
           this.wait(5000);
           this.evaluate(function() {
             if(document.body.style.backgroundColor===''){
@@ -98,6 +93,18 @@ var spooky = new Spooky({
             document.body.style.backgroundColor="#fff"
             }
           });
+        });
+        spooky.then(
+          function () {
+            // this.echo('Screenshot for ' + values.name + ' (' + values.viewport.width + 'x' + values.viewport.height + ')', 'info');
+            // this.viewport(values.viewport.width, values.viewport.height);
+            // this.emit('hello', 'Hello, from ' + this.evaluate(function () {
+            //     return document.title;
+            // }));
+            this.capture('test.png');
+            // this.capture('screenshots/' + screenshotDateTime + '/' + values.name + '-' + values.viewport.width + 'x' + values.viewport.height + '.png');
+            // this.page.paperSize = { format: 'A3', orientation: 'portrait', border: '1cm'} ;
+            // this.capture('screenshots/' + screenshotDateTime + '/' + values.name + '-' + values.viewport.width + 'x' + values.viewport.height + '.pdf');
         });
         spooky.run();
     });
@@ -128,3 +135,12 @@ spooky.on('log', function (log) {
         console.log(log.message.replace(/ \- .*/, ''));
     }
 });
+
+
+function pad(number) {
+  var r = String(number);
+  if ( r.length === 1 ) {
+    r = '0' + r;
+  }
+  return r;
+}
