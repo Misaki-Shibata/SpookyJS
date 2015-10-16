@@ -85,20 +85,21 @@ var spooky = new Spooky({
         spooky.start(screenshotUrl);
         _.each(settings, function(values, key, settings) {
           // spooky.userAgent(values.userAgent);
+
           // emitで呼び出す
           spooky.on('elog', function (msg) {
             console.log(msg);
           });
 
-          spooky.thenOpen(screenshotUrl, function() {
-            this.wait(5000);
-            this.evaluate(function() {
-              if(document.body.style.backgroundColor===''){
-              // 透過背景になるのを防止
-              document.body.style.backgroundColor="#fff"
-              }
-            });
-          });
+          // spooky.thenOpen(screenshotUrl, function() {
+          //   this.wait(5000);
+          //   this.evaluate(function() {
+          //     if(document.body.style.backgroundColor===''){
+          //     // 透過背景になるのを防止
+          //     document.body.style.backgroundColor="#fff"
+          //     }
+          //   });
+          // });
 
           spooky.then([{
             k: key,
@@ -108,13 +109,21 @@ var spooky = new Spooky({
             h: values.viewport.height
             ,u: values.userAgent
           }, function () {
-            emit('elog', 'k:' + k +' w:'+ w + " h:"+ h + " u:" + u);
-            // this.userAgent(u);
-            this.viewport(w, h);
-            this.echo('Screenshot for ' + n + ' (' + w + 'x' + h + ')', 'info');
-            this.capture('screenshots/' + t + '/' + n + '-' + w + 'x' + h + '.png');
-            //     // this.page.paperSize = { format: 'A3', orientation: 'portrait', border: '1cm'} ;
-            //     // this.capture('screenshots/' + screenshotDateTime + '/' + values.name + '-' + values.viewport.width + 'x' + values.viewport.height + '.pdf');
+            this.wait(2000 * (k + 1), function() {
+              // this.evaluate(function() {
+              //   if(document.body.style.backgroundColor===''){
+              //   // 透過背景になるのを防止
+              //   document.body.style.backgroundColor="#fff"
+              //   }
+              // });
+              emit('elog', 'k:' + k +' w:'+ w + " h:"+ h + " u:" + u);
+              // this.userAgent(u);
+              this.viewport(w, h);
+              this.echo('Screenshot for ' + n + ' (' + w + 'x' + h + ')', 'info');
+              this.capture('screenshots/' + t + '/' + n + '-' + w + 'x' + h + '.png');
+              //     // this.page.paperSize = { format: 'A3', orientation: 'portrait', border: '1cm'} ;
+              //     // this.capture('screenshots/' + screenshotDateTime + '/' + values.name + '-' + values.viewport.width + 'x' + values.viewport.height + '.pdf');
+            });
           }]);
 
           // spooky.then(function () {
@@ -143,7 +152,7 @@ spooky.on('console', function (line) {
 });
 */
 
-spooky.on('hello', function (greeting) {
+spooky.on('elog', function (greeting) {
     console.log(greeting);
 });
 
